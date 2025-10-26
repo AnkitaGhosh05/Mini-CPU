@@ -1,0 +1,44 @@
+timescale 1ns / 1ps
+module mini_cpu (
+    input clk,
+    input reset,
+    input [3:0] instruction,   // 4-bit opcode
+    input [3:0] data_in,       // Input data
+    output reg [3:0] result    // Output result
+);
+
+    reg [3:0] regA, regB;     // Two general purpose registers
+    reg [3:0] alu_out;        // ALU result
+
+    // Opcode definition
+    parameter LOAD_A = 4'b0001,
+              LOAD_B = 4'b0010,
+              ADD    = 4'b0011,
+              SUB    = 4'b0100;
+
+    // CPU Operation
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            regA <= 4'b0000;
+            regB <= 4'b0000;
+            alu_out <= 4'b0000;
+            result <= 4'b0000;
+        end 
+        else begin
+            case (instruction)
+                LOAD_A: regA <= data_in;          // Load data into A
+                LOAD_B: regB <= data_in;          // Load data into B
+                ADD: begin
+                    alu_out <= regA + regB;       // Perform addition
+                    result <= alu_out;
+                end
+                SUB: begin
+                    alu_out <= regA - regB;       // Perform subtraction
+                    result <= alu_out;
+                end
+                default: result <= result;        // Hold value
+            endcase
+        end
+    end
+
+endmodule
